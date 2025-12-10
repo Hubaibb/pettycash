@@ -1,22 +1,27 @@
 const express = require("express");
 const { graphqlHTTP } = require("express-graphql");
+const mongoose = require("mongoose");
+
 const schema = require("./schema");
+const resolvers = require("./resolvers");
 
 const app = express();
 
-const root = {
-  hello: () => "Petty Cash Tracker API is running!"
-};
+mongoose.connect(
+  "mongodb+srv://fanialxkidz_db_user:TubesIAE@cluster0.bvzdexd.mongodb.net/pettycash?retryWrites=true&w=majority&appName=Cluster0"
+)
+  .then(() => console.log("MongoDB Atlas connected"))
+  .catch(err => console.log("MongoDB Error:", err));
 
 app.use(
   "/graphql",
   graphqlHTTP({
-    schema: schema,
-    rootValue: root,
+    schema,
+    rootValue: resolvers,
     graphiql: true,
   })
 );
 
 app.listen(4000, () => {
-  console.log("GraphQL running on http://localhost:4000/graphql");
+  console.log("Server running at http://localhost:4000/graphql");
 });

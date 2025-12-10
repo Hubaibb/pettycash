@@ -1,6 +1,6 @@
 const { buildSchema } = require("graphql");
 
-const schema = buildSchema(`
+module.exports = buildSchema(`
   type Transaction {
     id: ID!
     date: String!
@@ -10,8 +10,18 @@ const schema = buildSchema(`
   }
 
   type Query {
-    hello: String
+    getTransactions: [Transaction]
+  }
+
+  input TransactionInput {
+    date: String!
+    description: String!
+    amount: Int!
+    type: String!
+  }
+
+  type Mutation {
+    addTransaction(input: TransactionInput): Transaction
+    deleteTransaction(id: ID!): Boolean
   }
 `);
-
-module.exports = schema;
