@@ -7,11 +7,15 @@ const resolvers = require("./resolvers");
 
 const app = express();
 
-mongoose.connect(
-  "mongodb+srv://fanialxkidz_db_user:TubesIAE@cluster0.bvzdexd.mongodb.net/pettycash?retryWrites=true&w=majority&appName=Cluster0"
-)
-  .then(() => console.log("MongoDB Atlas connected"))
-  .catch(err => console.log("MongoDB Error:", err));
+// Mengambil URI dari environment variable docker-compose, atau fallback ke localhost jika dijalankan manual
+const dbUri = process.env.MONGO_URI || 'mongodb://localhost:27017/pettycash';
+
+mongoose.connect(dbUri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+
+console.log(`Connecting to database at: ${dbUri}`); // Optional: untuk debugging
 
 app.use(
   "/graphql",
