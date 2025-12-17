@@ -1,21 +1,22 @@
+require("dotenv").config();
+
 const express = require("express");
 const { graphqlHTTP } = require("express-graphql");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const schema = require("./schema");
 const resolvers = require("./resolvers");
 
 const app = express();
+app.use(cors());
 
-// Mengambil URI dari environment variable docker-compose, atau fallback ke localhost jika dijalankan manual
-const dbUri = process.env.MONGO_URI || 'mongodb://localhost:27017/pettycash';
+const dbUri = process.env.MONGO_URI;
+console.log(`Connecting to database at: ${dbUri}`);
 
-mongoose.connect(dbUri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
-
-console.log(`Connecting to database at: ${dbUri}`); // Optional: untuk debugging
+mongoose.connect(dbUri)
+  .then(() => console.log("MongoDB Atlas connected"))
+  .catch(err => console.error("MongoDB connection error:", err.message));
 
 app.use(
   "/graphql",
@@ -26,6 +27,6 @@ app.use(
   })
 );
 
-app.listen(4000, () => {
+app.listen(process.env.PORT || 4000, () => {
   console.log("Server running at http://localhost:4000/graphql");
 });

@@ -1,10 +1,135 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+  <meta charset="UTF-8">
   <title>Petty Cash Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #2c3e50;
+    }
+
+    button {
+      padding: 10px 16px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    button:hover {
+      background: #2980b9;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background: #ecf0f1;
+      text-align: left;
+    }
+
+    .loading {
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Petty Cash Tracker Client</h1>
-  <p>Frontend siap untuk Week 3.</p>
+
+  <h1>Petty Cash Tracker</h1>
+
+  <button onclick="loadData()">Tampilkan Transaksi</button>
+
+  <p id="status" class="loading"></p>
+  <p id="error" class="error"></p>
+
+  <table id="table" style="display:none">
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>Deskripsi</th>
+        <th>Jumlah</th>
+        <th>Tipe</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <script>
+    async function loadData() {
+      document.getElementById("status").innerText = "Memuat data...";
+      document.getElementById("error").innerText = "";
+      document.getElementById("table").style.display = "none";
+
+      try {
+        const response = await fetch("http://localhost:4000/graphql", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            query: `
+              {
+                getTransactions {
+                  date
+                  description
+                  amount
+                  type
+                }
+              }
+            `
+          })
+        });
+
+        const result = await response.json();
+
+        const transactions = result.data.getTransactions;
+        const tbody = document.getElementById("tbody");
+        tbody.innerHTML = "";
+
+        transactions.forEach(tx => {
+          const row = `
+            <tr>
+              <td>${tx.date}</td>
+              <td>${tx.description}</td>
+              <td>${tx.amount}</td>
+              <td>${tx.type}</td>
+            </tr>
+          `;
+          tbody.innerHTML += row;
+        });
+
+        document.getElementById("table").style.display = "table";
+        document.getElementById("status").innerText = "";
+
+      } catch (err) {
+        document.getElementById("status").innerText = "";
+        document.getElementById("error").innerText =
+          "Gagal mengambil data. Pastikan backend GraphQL aktif.";
+      }
+    }
+  </script>
+
 </body>
 </html>

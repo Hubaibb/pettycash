@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  backend:
+    build: .
+    container_name: pettycash-backend
+    ports:
+      - "4000:4000"
+    environment:
+      - MONGO_URI=mongodb+srv://nielyusuf17_db_user:bbCPL4lte5n0cQ76@tubesiae.n5nbodq.mongodb.net/?appName=TUBESIAE
