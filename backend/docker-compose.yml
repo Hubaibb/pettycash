@@ -1,10 +1,42 @@
 version: "3.8"
 
 services:
+  # MongoDB Service
+  mongodb:
+    image: mongo:7.0
+    container_name: pettycash-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: pettycash
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - pettycash-network
+
+  # Backend Service
   backend:
     build: .
     container_name: pettycash-backend
+    restart: always
     ports:
       - "4000:4000"
     environment:
-      - MONGO_URI=mongodb+srv://nielyusuf17_db_user:bbCPL4lte5n0cQ76@tubesiae.n5nbodq.mongodb.net/?appName=TUBESIAE
+      - MONGO_URI=mongodb://admin:password123@mongodb:27017/pettycash?authSource=admin
+      - PORT=4000
+    depends_on:
+      - mongodb
+    networks:
+      - pettycash-network
+    volumes:
+      - ./src:/app/src
+
+networks:
+  pettycash-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
